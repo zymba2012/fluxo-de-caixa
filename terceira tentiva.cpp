@@ -122,6 +122,20 @@ void carregarFuncionarios(struct Funcionario *funcionarios, int *numFuncionarios
     fclose(arquivo);
 }
 
+void salvarProdutos(struct Produto *produtos, int numProdutos) {
+    FILE *arquivo = fopen("produtos.txt", "w");
+    if (arquivo == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo de produtos para escrita.\n");
+        return;
+    }
+
+    for (int i = 0; i < numProdutos; i++) {
+        fprintf(arquivo, "%s %.2f %d\n", produtos[i].nome, produtos[i].preco, produtos[i].codigo);
+    }
+
+    fclose(arquivo);
+}
+
 void salvarClientes(struct Cliente *clientes, int numClientes) {
     FILE *arquivo = fopen("clientes.txt", "w");
     if (arquivo == NULL) {
