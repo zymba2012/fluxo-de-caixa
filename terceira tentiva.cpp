@@ -70,15 +70,7 @@ void cadastrarCliente(struct Cliente *cliente) {
     scanf("%d", &cliente->idade);
     cliente->vendas = 0.0;
 }
-void cadastrarProduto(struct Produto *produto) {
-    printf("Digite o nome do produto: \n");
-    limparBufferEntrada();
-    fgets(produto->nome, sizeof(produto->nome), stdin);
-    produto->nome[strcspn(produto->nome, "\n")] = '\0';  // Remove a quebra de linha final
-    printf("Digite o preço do produto: ");
-    scanf("%f", &produto->preco);
-    produto->codigo = gerarCodigo();
-}
+
 void carregarProdutos(struct Produto *produtos, int *numProdutos) {
     FILE *arquivo = fopen("produtos.txt", "r");
     if (arquivo == NULL) {
