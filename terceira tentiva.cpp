@@ -1,425 +1,252 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <locale.h>
-#include <time.h>
+#include <stdlib.h>
+#include <unistd.h> // No Linux/Mac
+//#include <windows.h>
 
-struct Produto {
-    char nome[50];
-    float preco;
-    int codigo;
-};
+typedef struct {
+	int codigo;
+	char nome[30];
+	float preco;
+} Produto;
 
-struct Funcionario {
-    char nome[50];
-    char dataAdmissao[20];
-    int matricula;
-    float comissao;
-};
+typedef struct {
+	Produto produto;
+	int quantidade;
+} Carrinho;
 
-struct Cliente {
-    char nome[50];
-    int idade;
-    float vendas;
-};
+void infoProduto(Produto prod);
+void menu();
+void cadastrarProduto();
+void listarProdutos();
+void comprarProduto();
+void visualizarCarrinho();
+Produto pegarProdutoPorCodigo(int codigo);
+int * temNoCarrinho(int codigo);
+void fecharPedido();
 
-struct Venda {
-    struct Cliente cliente;
-    struct Funcionario funcionario;
-    float valorTotal;
-};
-int gerarCodigo() {
-    // Inicializa a semente com o tempo atual
-    srand(time(NULL));
-    return rand() % 9000 + 1000;
+static int contador_produto = 0;
+static int contador_carrinho = 0;
+static Carrinho carrinho[50];
+static Produto produtos[50];
+
+
+int main(){
+	menu();
+	return 0;
 }
 
-int gerarMatricula() {
-    // Inicializa a semente com o tempo atual
-    srand(time(NULL));
-    return rand() % 900000 + 100000;
+void infoProduto(Produto prod){
+	printf("Código: %d \nNome: %s \nPreço: %.2f\n", prod.codigo, strtok(prod.nome, "\n"), prod.preco);
 }
 
-void clearScreen() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+void menu(){
+	printf("=========================================\n");
+	printf("================ Bem-vindo(a) ===========\n");
+	printf("================  Shelby ltda.   ===========\n");
+	printf("=========================================\n");
+
+	printf("Selecione uma opção abaixo: \n");
+	printf("1 - Cadastrar produto\n");
+	printf("2 - Listar produtos\n");
+	printf("3 - Comprar produto\n");
+	printf("4 - Visualizar carrinho\n");
+	printf("5 - Fechar pedido\n");
+	printf("6 - Sair do sistema\n");
+
+	int opcao;
+	scanf("%d", &opcao);
+	getchar();
+
+	switch (opcao) {
+		case 1:
+			cadastrarProduto();
+			break;
+		case 2:
+			listarProdutos();
+			break;
+		case 3:
+			comprarProduto();
+			break;
+		case 4:
+			visualizarCarrinho();
+			break;
+		case 5:
+			fecharPedido();
+			break;
+		case 6:
+			printf("Volte sempre!\n");
+			sleep(2); //Sleep(2)
+			exit(0);
+		default:
+			printf("Opção inválida.\n");
+			sleep(2);
+			menu();
+			break;
+	}
 }
 
-void cadastrarProduto(struct Produto *produto) {
-    printf("Digite o nome do produto: \n");
-    fflush(stdin);
-    fgets(produto->nome, sizeof(produto->nome), stdin);
-    produto->nome[strcspn(produto->nome, "\n")] = '\0';  // Remove a quebra de linha final
-    printf("Digite o preço do produto: ");
-    scanf("%f", &produto->preco);
-    produto->codigo = gerarCodigo();
+void cadastrarProduto(){
+	printf("Cadastro de Produto\n");
+	printf("====================\n");
+
+	printf("Informe o nome do produto: \n");
+	fgets(produtos[contador_produto].nome, 30, stdin);
+
+	printf("Informe o preço do produto: \n");
+	scanf("%f", &produtos[contador_produto].preco);
+
+	printf("O produto %s foi cadastrado com sucesso.\n", strtok(produtos[contador_produto].nome, "\n"));
+
+	produtos[contador_produto].codigo = (contador_produto + 1);
+	contador_produto++;
+
+	sleep(2);
+	menu();
 }
 
-void cadastrarFuncionario(struct Funcionario *funcionario) {
-    printf("Digite o nome do funcionário: ");
-    scanf("%s", funcionario->nome);
-    printf("Digite a data de admissão do funcionário: ");
-    scanf("%s", funcionario->dataAdmissao);
-    funcionario->matricula = gerarMatricula();
-    funcionario->comissao = 0.0;
+void listarProdutos(){
+	if(contador_produto > 0){
+		printf("Listagem de produtos.\n");
+		printf("---------------------\n");
+		for(int i = 0; i < contador_produto; i++){
+			infoProduto(produtos[i]);
+			printf("------------------\n");
+			sleep(1);
+		}
+		sleep(2);
+		menu();
+	}else{
+		printf("Não temos ainda produtos cadastrados.\n");
+		sleep(2);
+		menu();
+	}
 }
 
-void cadastrarCliente(struct Cliente *cliente) {
-    printf("Digite o nome do cliente: ");
-    scanf("%s", cliente->nome);
-    printf("Digite a idade do cliente: ");
-    scanf("%d", &cliente->idade);
-    cliente->vendas = 0.0;
+void comprarProduto(){
+	if(contador_produto > 0){
+		printf("Informe o código do produto que deseja adicionar ao carrinho.\n");
+
+		printf("========== Produtos Disponíveis ===========\n");
+		for(int i = 0; i < contador_produto; i++){
+			infoProduto(produtos[i]);
+			printf("---------------------\n");
+			sleep(1);
+		}
+		int codigo;
+		scanf("%d", &codigo);
+		getchar();
+
+		int tem_mercado = 0;
+		for(int i = 0; i < contador_produto; i++){
+			if(produtos[i].codigo == codigo){
+				tem_mercado = 1;
+
+				if(contador_carrinho > 0){
+					int * retorno = temNoCarrinho(codigo);
+
+					if(retorno[0] == 1){
+						carrinho[retorno[1]].quantidade++;
+						printf("Aumentei a quantidade do produto %s já existente no carrinho.\n",
+								strtok(carrinho[retorno[1]].produto.nome, "\n"));
+						sleep(2);
+						menu();
+					}else{
+						Produto p = pegarProdutoPorCodigo(codigo);
+						carrinho[contador_carrinho].produto = p;
+						carrinho[contador_carrinho].quantidade = 1;
+						contador_carrinho++;
+						printf("O produto %s foi adicionado ao carrinho.\n", strtok(p.nome, "\n"));
+						sleep(2);
+						menu();
+					}
+				}else{
+					Produto p = pegarProdutoPorCodigo(codigo);
+					carrinho[contador_carrinho].produto = p;
+					carrinho[contador_carrinho].quantidade = 1;
+					contador_carrinho++;
+					printf("O produto %s foi adicionado ao carrinho.\n", strtok(p.nome, "\n"));
+					sleep(2);
+					menu();
+				}
+			}
+		}
+		if(tem_mercado < 1){
+			printf("Não foi encontrado o produto com código %d.\n", codigo);
+			sleep(2);
+			menu();
+		}
+	}else{
+		printf("Ainda não existem produtos para vender.\n");
+		sleep(2);
+		menu();
+	}
 }
 
-void carregarProdutos(struct Produto *produtos, int *numProdutos) {
-    FILE *arquivo = fopen("produtos.txt", "r");
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo de produtos para leitura");
-        return;
-    }
-
-    while (fscanf(arquivo, "%s %f %d", produtos[*numProdutos].nome, &produtos[*numProdutos].preco, &produtos[*numProdutos].codigo) == 3) {
-        (*numProdutos)++;
-    }
-
-    fclose(arquivo);
+void visualizarCarrinho(){
+	if(contador_carrinho > 0){
+		printf("Produtos do Carrinho\n");
+		printf("--------------------\n");
+		for(int i = 0; i < contador_carrinho; i++){
+			infoProduto(carrinho[i].produto);
+			printf("Quantidade: %d\n", carrinho[i].quantidade);
+			printf("-----------------\n");
+			sleep(1);
+		}
+		sleep(2);
+		menu();
+	}else{
+		printf("Não temos ainda produtos no carrinho.\n");
+		sleep(2);
+		menu();
+	}
 }
 
-void salvarFuncionarios(struct Funcionario *funcionarios, int numFuncionarios) {
-    FILE *arquivo = fopen("funcionarios.txt", "w");
-    if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo de funcionários para escrita.\n");
-        return;
-    }
-
-    for (int i = 0; i < numFuncionarios; i++) {
-        fprintf(arquivo, "%s %s %d %.2f\n", funcionarios[i].nome, funcionarios[i].dataAdmissao, funcionarios[i].matricula, funcionarios[i].comissao);
-    }
-
-    fclose(arquivo);
+Produto pegarProdutoPorCodigo(int codigo){
+	Produto p;
+	for(int i = 0; i < contador_produto; i++){
+		if(produtos[i].codigo == codigo){
+			p = produtos[i];
+		}
+	}
+	return p;
 }
 
-void carregarFuncionarios(struct Funcionario *funcionarios, int *numFuncionarios) {
-    FILE *arquivo = fopen("funcionarios.txt", "r");
-    if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo de funcionários para leitura.\n");
-        return;
-    }
-
-    while (fscanf(arquivo, "%s %s %d %f", funcionarios[*numFuncionarios].nome, funcionarios[*numFuncionarios].dataAdmissao, &funcionarios[*numFuncionarios].matricula, &funcionarios[*numFuncionarios].comissao) == 4) {
-        (*numFuncionarios)++;
-    }
-
-    fclose(arquivo);
+int * temNoCarrinho(int codigo){
+	int static retorno[] = {0, 0};
+	for(int i = 0; i < contador_carrinho; i++){
+		if(carrinho[i].produto.codigo == codigo){
+			retorno[0] = 1; //tem o produto com este código no carrinho
+			retorno[1] = i; //o índice do produto no carrinho
+		}
+	}
+	return retorno;
 }
 
-void salvarProdutos(struct Produto *produtos, int numProdutos) {
-    FILE *arquivo = fopen("produtos.txt", "w");
-    if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo de produtos para escrita.\n");
-        return;
-    }
+void fecharPedido(){
+	if(contador_carrinho > 0){
+		float valorTotal = 0.0;
+		printf("Produtos do Carrinho\n");
+		printf("--------------------\n");
+		for(int i = 0; i < contador_carrinho; i++){
+			Produto p = carrinho[i].produto;
+			int quantidade = carrinho[i].quantidade;
+			valorTotal += p.preco * quantidade;
+			infoProduto(p);
+			printf("Quantidade: %d\n", quantidade);
+			printf("---------------\n");
+			sleep(1);
+		}
+		printf("Sua fatura é R$ %.2f\n", valorTotal);
 
-    for (int i = 0; i < numProdutos; i++) {
-        fprintf(arquivo, "%s %.2f %d\n", produtos[i].nome, produtos[i].preco, produtos[i].codigo);
-    }
-
-    fclose(arquivo);
-}
-
-void salvarClientes(struct Cliente *clientes, int numClientes) {
-    FILE *arquivo = fopen("clientes.txt", "w");
-    if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo de clientes para escrita.\n");
-        return;
-    }
-
-    for (int i = 0; i < numClientes; i++) {
-        fprintf(arquivo, "%s %d %.2f\n", clientes[i].nome, clientes[i].idade, clientes[i].vendas);
-    }
-
-    fclose(arquivo);
-}
-
-void carregarClientes(struct Cliente *clientes, int *numClientes) {
-    FILE *arquivo = fopen("clientes.txt", "r");
-    if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo de clientes para leitura.\n");
-        return;
-    }
-
-    while (fscanf(arquivo, "%s %d %f", clientes[*numClientes].nome, &clientes[*numClientes].idade, &clientes[*numClientes].vendas) == 3) {
-        (*numClientes)++;
-    }
-
-    fclose(arquivo);
-}
-
-void registrarVenda(struct Venda *venda, struct Produto *produtos, int numProdutos,
-                    struct Cliente *clientes, int numClientes,
-                    struct Funcionario *funcionarios, int numFuncionarios) {
-    int opcaoCliente;
-    printf("Escolha a opção (1 - Cliente Cadastrado, 2 - Cliente Avulso): ");
-    scanf("%d", &opcaoCliente);
-
-    if (opcaoCliente == 1) {
-        int codigoCliente;
-        printf("Digite o código do cliente cadastrado: ");
-        scanf("%d", &codigoCliente);
-
-        // Encontrar cliente pelo código
-        int clienteEncontrado = 0;
-        for (int i = 0; i < numClientes; i++) {
-            if (clientes[i].vendas == codigoCliente) {
-                venda->cliente = clientes[i];
-                clienteEncontrado = 1;
-                break;
-            }
-        }
-
-        if (!clienteEncontrado) {
-            printf("Cliente não encontrado. Registrando como cliente avulso.\n");
-            opcaoCliente = 2; // Registrar como cliente avulso
-        }
-    }
-
-    if (opcaoCliente == 2) {
-        cadastrarCliente(&venda->cliente);
-    }
-
-    int codigoProduto;
-    printf("Digite o código do produto: ");
-    scanf("%d", &codigoProduto);
-
-    int produtoEncontrado = 0;
-    for (int i = 0; i < numProdutos; i++) {
-        if (produtos[i].codigo == codigoProduto) {
-            printf("Produto encontrado:\n");
-            printf("Nome: %s\n", produtos[i].nome);
-            printf("Preço: %.2f\n", produtos[i].preco);
-            venda->valorTotal = produtos[i].preco;
-            produtoEncontrado = 1;
-            break;
-        }
-    }
-
-    if (!produtoEncontrado) {
-        printf("Produto não encontrado. Venda cancelada.\n");
-        return;
-    }
-
-    int matriculaFuncionario;
-    printf("Digite a matrícula do funcionário: ");
-    scanf("%d", &matriculaFuncionario);
-
-    int funcionarioEncontrado = 0;
-    for (int i = 0; i < numFuncionarios; i++) {
-        if (funcionarios[i].matricula == matriculaFuncionario) {
-            venda->funcionario = funcionarios[i];
-            funcionarioEncontrado = 1;
-            break;
-        }
-    }
-
-    if (!funcionarioEncontrado) {
-        printf("Funcionário não encontrado. Venda cancelada.\n");
-        return;
-    }
-
-    venda->cliente.vendas += venda->valorTotal;
-    venda->funcionario.comissao += 0.007 * venda->valorTotal;
-
-    printf("Venda registrada com sucesso!\n");
-}
-void pesquisarProduto(struct Produto *produtos, int numProdutos) {
-    int opcao;
-    printf("Escolha a opção de pesquisa (1 - Código, 2 - Preço): ");
-    scanf("%d", &opcao);
-
-    if (opcao == 1) {
-        int codigo;
-        printf("Digite o código do produto: ");
-        scanf("%d", &codigo);
-
-        for (int i = 0; i < numProdutos; i++) {
-            if (produtos[i].codigo == codigo) {
-                printf("Produto encontrado:\n");
-                printf("Nome: %s\n", produtos[i].nome);
-                printf("Preço: %.2f\n", produtos[i].preco);
-                printf("Código: %d\n", produtos[i].codigo);
-                return;
-            }
-        }
-
-        printf("Produto não encontrado.\n");
-    } else if (opcao == 2) {
-        float preco;
-        printf("Digite o preço do produto: ");
-        scanf("%f", &preco);
-
-        for (int i = 0; i < numProdutos; i++) {
-            if (produtos[i].preco == preco) {
-                printf("Produto encontrado:\n");
-                printf("Nome: %s\n", produtos[i].nome);
-                printf("Preço: %.2f\n", produtos[i].preco);
-                printf("Código: %d\n", produtos[i].codigo);
-                return;
-            }
-        }
-
-        printf("Produto não encontrado.\n");
-    } else {
-        printf("Opção inválida.\n");
-    }
-}
-
-void pesquisarVenda(struct Cliente *clientes, int numClientes) {
-    int opcao;
-    printf("Escolha a opção de pesquisa (1 - Data, 2 - Preço, 3 - Nome do cliente): ");
-    scanf("%d", &opcao);
-
-    if (opcao == 1) {
-        // Implemente a pesquisa por data
-    } else if (opcao == 2) {
-        // Implemente a pesquisa por preço
-    } else if (opcao == 3) {
-        char nomeCliente[50];
-        printf("Digite o nome do cliente: ");
-        scanf("%s", nomeCliente);
-
-        for (int i = 0; i < numClientes; i++) {
-            if (strcmp(clientes[i].nome, nomeCliente) == 0) {
-                printf("Venda encontrada:\n");
-                printf("Nome do cliente: %s\n", clientes[i].nome);
-                printf("Idade do cliente: %d\n", clientes[i].idade);
-                printf("Vendas realizadas: %.2f\n", clientes[i].vendas);
-                return;
-            }
-        }
-
-        printf("Cliente não encontrado.\n");
-    } else {
-        printf("Opção inválida.\n");
-    }
-}
-
-void exibirProdutos(struct Produto *produtos, int numProdutos) {
-    printf("Produtos cadastrados:\n");
-    for (int i = 0; i < numProdutos; i++) {
-        printf("Nome: %s\n", produtos[i].nome);
-        printf("Preço: %.2f\n", produtos[i].preco);
-        printf("Código: %d\n", produtos[i].codigo);
-        printf("\n");
-    }
-}
-
-void exibirVendas(struct Cliente *clientes, int numClientes) {
-    printf("Vendas realizadas:\n");
-    for (int i = 0; i < numClientes; i++) {
-        printf("Nome do cliente: %s\n", clientes[i].nome);
-        printf("Idade do cliente: %d\n", clientes[i].idade);
-        printf("Vendas realizadas: %.2f\n", clientes[i].vendas);
-        printf("\n");
-    }
-}
-
-
-void calcularComissao(struct Funcionario *funcionarios, int numFuncionarios) {
-    printf("Cálculo de comissão:\n");
-
-    for (int i = 0; i < numFuncionarios; i++) {
-        printf("Nome do funcionário: %s\n", funcionarios[i].nome);
-        printf("Matrícula: %d\n", funcionarios[i].matricula);
-        printf("Comissão acumulada: %.2f\n", funcionarios[i].comissao);
-        printf("Salário base: 1300.00\n");
-        printf("Salário total: %.2f\n", 1300.00 + funcionarios[i].comissao);
-        printf("\n");
-    }
-}
-
-int main() {
-    setlocale(LC_ALL, "Portuguese");
-    int opcao;
-    struct Produto produtos[100];
-    int numProdutos = 0;
-
-    struct Funcionario funcionarios[100];
-    int numFuncionarios = 0;
-
-    struct Cliente clientes[100];
-    int numClientes = 0;
-
-    struct Venda venda;
-
-    // Carregar dados do arquivo ao iniciar o programa
-    carregarProdutos(produtos, &numProdutos);
-    carregarFuncionarios(funcionarios, &numFuncionarios);
-    carregarClientes(clientes, &numClientes);
-
-    do {
-        printf("\nMenu:\n");
-        printf("1 - Cadastrar produto\n");
-        printf("2 - Cadastrar funcionário\n");
-        printf("3 - Cadastrar cliente\n");
-        printf("4 - Registrar venda\n");
-        printf("5 - Pesquisar produto\n");
-        printf("6 - Pesquisar venda\n");
-        printf("7 - Exibir produtos cadastrados\n");
-        printf("8 - Exibir vendas realizadas\n");
-        printf("9 - Calcular comissão\n");
-        printf("10 - Sair\n");
-        printf("Escolha uma opção: ");
-        scanf("%d", &opcao);
-        system("cls");
-
-  switch (opcao) {
-            case 1:
-                cadastrarProduto(&produtos[numProdutos]);
-                numProdutos++;
-                break;
-            case 2:
-                cadastrarFuncionario(&funcionarios[numFuncionarios]);
-                numFuncionarios++;
-                break;
-            case 3:
-                cadastrarCliente(&clientes[numClientes]);
-                numClientes++;
-                break;
-            case 4:
-                registrarVenda(&venda, produtos, numProdutos, clientes, numClientes, funcionarios, numFuncionarios);
-                break;
-            case 5:
-                pesquisarProduto(produtos, numProdutos);
-                break;
-            case 6:
-                pesquisarVenda(clientes, numClientes);
-                break;
-            case 7:
-                exibirProdutos(produtos, numProdutos);
-                break;
-            case 8:
-                exibirVendas(clientes, numClientes);
-                break;
-            case 9:
-                calcularComissao(funcionarios, numFuncionarios);
-                break;
-            case 10:
-                // Salvar dados no arquivo ao sair do programa
-                salvarProdutos(produtos, numProdutos);
-                salvarFuncionarios(funcionarios, numFuncionarios);
-                salvarClientes(clientes, numClientes);
-                
-
-                printf("Saindo do programa. Obrigado!\n");
-                break;
-            default:
-                printf("Opção inválida. Tente novamente.\n");
-        }
-    } while (opcao != 10);
-
-    return 0;
+		//limpar carrinho
+		contador_carrinho = 0;
+		printf("Obrigado pela preferência.\n");
+		sleep(5);
+		menu();
+	}else{
+		printf("Você não tem nenhum produto no carrinho ainda.\n");
+		sleep(3);
+		menu();
+	}
 }
