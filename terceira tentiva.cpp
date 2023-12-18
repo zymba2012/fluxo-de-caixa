@@ -47,6 +47,7 @@ void clearScreen() {
 
 void cadastrarProduto(struct Produto *produto) {
     printf("Digite o nome do produto: \n");
+    fflush(stdin);
     fgets(produto->nome, sizeof(produto->nome), stdin);
     produto->nome[strcspn(produto->nome, "\n")] = '\0';  // Remove a quebra de linha final
     printf("Digite o preço do produto: ");
