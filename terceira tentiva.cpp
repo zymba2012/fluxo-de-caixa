@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
-
+#include <time.h>
 
 struct Produto {
     char nome[50];
@@ -28,12 +28,15 @@ struct Venda {
     struct Funcionario funcionario;
     float valorTotal;
 };
-
 int gerarCodigo() {
+    // Inicializa a semente com o tempo atual
+    srand(time(NULL));
     return rand() % 9000 + 1000;
 }
 
 int gerarMatricula() {
+    // Inicializa a semente com o tempo atual
+    srand(time(NULL));
     return rand() % 900000 + 100000;
 }
 
@@ -85,7 +88,6 @@ void carregarProdutos(struct Produto *produtos, int *numProdutos) {
 
     fclose(arquivo);
 }
-
 
 void salvarFuncionarios(struct Funcionario *funcionarios, int numFuncionarios) {
     FILE *arquivo = fopen("funcionarios.txt", "w");
