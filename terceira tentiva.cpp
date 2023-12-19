@@ -24,6 +24,11 @@ void visualizarCarrinho();
 Produto pegarProdutoPorCodigo(int codigo);
 int * temNoCarrinho(int codigo);
 void fecharPedido();
+void salvarCarrinho();
+void carregarProdutos();
+void salvarCarrinho();
+void carregarCarrinho();
+void encerrarPrograma();
 
 static int contador_produto = 0;
 static int contador_carrinho = 0;
@@ -43,7 +48,7 @@ void infoProduto(Produto prod){
 void menu(){
 	printf("=========================================\n");
 	printf("================ Bem-vindo(a) ===========\n");
-	printf("================  Shelby ltda.   ===========\n");
+	printf("================  Geek Shop   ===========\n");
 	printf("=========================================\n");
 
 	printf("Selecione uma opção abaixo: \n");
@@ -75,9 +80,7 @@ void menu(){
 			fecharPedido();
 			break;
 		case 6:
-			printf("Volte sempre!\n");
-			sleep(2); //Sleep(2)
-			exit(0);
+			encerrarPrograma();
 		default:
 			printf("Opção inválida.\n");
 			sleep(2);
@@ -249,4 +252,65 @@ void fecharPedido(){
 		sleep(3);
 		menu();
 	}
+}
+void salvarProdutos() {
+    FILE *arquivo = fopen("produtos.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo de produtos para escrita.\n");
+        return;
+    }
+
+    for (int i = 0; i < contador_produto; i++) {
+        fprintf(arquivo, "%d %s %.2f\n", produtos[i].codigo, strtok(produtos[i].nome, "\n"), produtos[i].preco);
+    }
+
+    fclose(arquivo);
+}
+
+void carregarProdutos() {
+    FILE *arquivo = fopen("produtos.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo de produtos para leitura.\n");
+        return;
+    }
+
+    while (fscanf(arquivo, "%d %[^\n] %f\n", &produtos[contador_produto].codigo, produtos[contador_produto].nome, &produtos[contador_produto].preco) == 3) {
+        contador_produto++;
+    }
+
+    fclose(arquivo);
+}
+
+void salvarCarrinho() {
+    FILE *arquivo = fopen("carrinho.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo do carrinho para escrita.\n");
+        return;
+    }
+
+    for (int i = 0; i < contador_carrinho; i++) {
+        fprintf(arquivo, "%d %s %.2f %d\n", carrinho[i].produto.codigo, strtok(carrinho[i].produto.nome, "\n"), carrinho[i].produto.preco, carrinho[i].quantidade);
+    }
+
+    fclose(arquivo);
+}
+
+void carregarCarrinho() {
+    FILE *arquivo = fopen("carrinho.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo do carrinho para leitura.\n");
+        return;
+    }
+
+    while (fscanf(arquivo, "%d %[^\n] %f %d\n", &carrinho[contador_carrinho].produto.codigo, carrinho[contador_carrinho].produto.nome, &carrinho[contador_carrinho].produto.preco, &carrinho[contador_carrinho].quantidade) == 4) {
+        contador_carrinho++;
+    }
+
+    fclose(arquivo);
+}
+void encerrarPrograma() {
+    salvarProdutos();
+    salvarCarrinho();
+    printf("Saindo do programa. Obrigado!\n");
+    exit(0);
 }
