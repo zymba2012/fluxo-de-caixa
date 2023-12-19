@@ -33,15 +33,16 @@ Produto pegarProdutoPorCodigo(int codigo);
 int *temNoCarrinho(int codigo);
 void fecharPedido();
 void carregarProdutos();
+void salvarProdutos();
 void salvarCarrinho();
 void carregarCarrinho();
-void encerrarPrograma();
 void registrarVendedor();
 void cadastrarComissao();
 void calcularComissao();
 void carregarVendedores();
 void salvarVendedores();
 void mostrarVendedores();
+void encerrarPrograma();
 
 static int contador_vendedor = 0;
 static int contador_produto = 0;
@@ -53,6 +54,8 @@ int main() {
     setlocale(LC_ALL, "Portuguese");
 
     carregarProdutos();
+    carregarCarrinho();
+    carregarVendedores();
 
     menu();
     return 0;
@@ -135,7 +138,7 @@ void cadastrarProduto() {
 
     produtos[contador_produto].codigo = (contador_produto + 1);
     contador_produto++;
-    Sleep(30);
+    Sleep(3000);
     system("cls");
     menu();
 }
@@ -152,8 +155,10 @@ void listarProdutos() {
         printf("Não temos produtos cadastrados.\n");
         printf("Por favor, adicione os produtos.\n");
     }
-	Sleep(22);
-	system("cls");
+		Sleep(2000);
+     	system("cls");
+	
+	
     menu();
 }
 
@@ -204,7 +209,7 @@ void comprarProduto() {
     } else {
         printf("Ainda não existem produtos para vender.\n");
     }
-	Sleep(18);
+	Sleep(6000);
 	system("cls");
     menu();
 }
@@ -221,7 +226,7 @@ void visualizarCarrinho() {
     } else {
         printf("Ainda não temos produtos no carrinho.\n\n");
     }
-	    Sleep(10);
+	    Sleep(6000);
 	    system("cls");
     menu();
 }
@@ -247,7 +252,7 @@ int *temNoCarrinho(int codigo) {
     return retorno;
 }
 
-void fecharPedido() { 
+void fecharPedido() {
     if (contador_carrinho > 0) {
         float valorTotal = 0.0;
         printf("Produtos do Carrinho\n");
@@ -268,13 +273,13 @@ void fecharPedido() {
     } else {
         printf("Você ainda não tem produtos no carrinho ainda.\n\n");
     }
-    Sleep(1000);
-    system("cls");
+	    Sleep(6000);
+	    system("cls");
     menu();
 }
 
-void salvarProdutos() { 
-    FILE *arquivo = fopen("produtos.txt", "w");
+void salvarProdutos() {
+    FILE *arquivo = fopen("produtos.txt", "a");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo de produtos para escrita.\n");
         return;
@@ -287,20 +292,12 @@ void salvarProdutos() {
     fclose(arquivo);
 }
 
-void carregarProdutos() { 
+void carregarProdutos() {
     FILE *arquivo = fopen("produtos.txt", "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo de produtos para leitura.\n\n");
         return;
     }
-
-    while (fscanf(arquivo, "%d %[^\n] %f\n", &produtos[contador_produto].codigo, produtos[contador_produto].nome, &produtos[contador_produto].preco) == 3) {
-        contador_produto++;
-    }
-
-    fclose(arquivo);
-}
-
 
     while (fscanf(arquivo, "%d %[^\n] %f\n", &produtos[contador_produto].codigo, produtos[contador_produto].nome, &produtos[contador_produto].preco) == 3) {
         contador_produto++;
@@ -350,7 +347,7 @@ void registrarVendedor() {
     printf("O vendedor %s foi registrado com sucesso.\n", strtok(vendedores[contador_vendedor].nome, "\n"));
 
     contador_vendedor++;
-	    Sleep(20);
+	    Sleep(6000);
 	    system("cls");
     menu();
 }
@@ -382,7 +379,7 @@ void cadastrarComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-	    Sleep(20);
+	    Sleep(6000);
 	    system("cls");
     menu();
 }
@@ -407,7 +404,7 @@ void calcularComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-	    Sleep(10);
+	    Sleep(6000);
 	    system("cls");
     menu();
 }
@@ -454,12 +451,12 @@ void mostrarVendedores() {
             printf("Nome: %s\n", vendedores[i].nome);
             printf("Comissão: R$ %.2f\n", vendedores[i].comissao);
             printf("--------------------\n");
-            sleep(50);
+            Sleep(6000);
         }
-        sleep(10);
+        Sleep(6000);
     } else {
         printf("Não há vendedores registrados.\n\n");
-        sleep(10);
+        Sleep(6000);
     }
 }
 
@@ -468,6 +465,6 @@ void encerrarPrograma() {
     salvarCarrinho();
     salvarVendedores();
     printf("Saindo do programa. Obrigado!\n");
-    Sleep(40);
+    Sleep(6000);
     exit(0);
 }
