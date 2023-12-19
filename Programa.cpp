@@ -136,7 +136,7 @@ void cadastrarProduto() {
 
     produtos[contador_produto].codigo = (contador_produto + 1);
     contador_produto++;
-    Sleep(500);
+    Sleep(30);
     system("cls");
     menu();
 }
@@ -153,7 +153,7 @@ void listarProdutos() {
         printf("Não temos produtos cadastrados.\n");
         printf("Por favor, adicione os produtos.\n");
     }
-    Sleep(1000);
+	Sleep(20);
 	system("cls");
     menu();
 }
@@ -205,7 +205,7 @@ void comprarProduto() {
     } else {
         printf("Ainda não existem produtos para vender.\n");
     }
-    Sleep(1000);
+	Sleep(20);
 	system("cls");
     menu();
 }
@@ -222,8 +222,8 @@ void visualizarCarrinho() {
     } else {
         printf("Ainda não temos produtos no carrinho.\n\n");
     }
-    Sleep(1000);
-    system("cls");
+	    Sleep(20);
+	    system("cls");
     menu();
 }
 
@@ -269,8 +269,8 @@ void fecharPedido() {
     } else {
         printf("Você ainda não tem produtos no carrinho ainda.\n\n");
     }
-    Sleep(1000);
-    system("cls");
+	    Sleep(20);
+	    system("cls");
     menu();
 }
 
@@ -343,8 +343,8 @@ void registrarVendedor() {
     printf("O vendedor %s foi registrado com sucesso.\n", strtok(vendedores[contador_vendedor].nome, "\n"));
 
     contador_vendedor++;
-    Sleep(1000);
-    system("cls");
+	    Sleep(20);
+	    system("cls");
     menu();
 }
 
@@ -375,8 +375,8 @@ void cadastrarComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-    Sleep(1000);
-    system("cls");
+	    Sleep(20);
+	    system("cls");
     menu();
 }
 
@@ -400,8 +400,8 @@ void calcularComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-    Sleep(1000);
-    system("cls");
+	    Sleep(20);
+	    system("cls");
     menu();
 }
 
@@ -447,12 +447,12 @@ void mostrarVendedores() {
             printf("Nome: %s\n", vendedores[i].nome);
             printf("Comissão: R$ %.2f\n", vendedores[i].comissao);
             printf("--------------------\n");
-            sleep(1000);
+            sleep(50);
         }
-        sleep(1000);
+        sleep(20);
     } else {
         printf("Não há vendedores registrados.\n\n");
-        sleep(1000);
+        sleep(20);
     }
 }
 
@@ -461,6 +461,6 @@ void encerrarPrograma() {
     salvarCarrinho();
     salvarVendedores();
     printf("Saindo do programa. Obrigado!\n");
-    Sleep(1000);
+    Sleep(50);
     exit(0);
 }
