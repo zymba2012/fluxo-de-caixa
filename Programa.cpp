@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
@@ -153,7 +152,7 @@ void listarProdutos() {
         printf("Não temos produtos cadastrados.\n");
         printf("Por favor, adicione os produtos.\n");
     }
-	Sleep(20);
+	Sleep(22);
 	system("cls");
     menu();
 }
@@ -205,7 +204,7 @@ void comprarProduto() {
     } else {
         printf("Ainda não existem produtos para vender.\n");
     }
-	Sleep(20);
+	Sleep(18);
 	system("cls");
     menu();
 }
@@ -222,7 +221,7 @@ void visualizarCarrinho() {
     } else {
         printf("Ainda não temos produtos no carrinho.\n\n");
     }
-	    Sleep(20);
+	    Sleep(10);
 	    system("cls");
     menu();
 }
@@ -400,7 +399,7 @@ void calcularComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-	    Sleep(20);
+	    Sleep(10);
 	    system("cls");
     menu();
 }
@@ -449,10 +448,10 @@ void mostrarVendedores() {
             printf("--------------------\n");
             sleep(50);
         }
-        sleep(20);
+        sleep(10);
     } else {
         printf("Não há vendedores registrados.\n\n");
-        sleep(20);
+        sleep(10);
     }
 }
 
@@ -461,6 +460,6 @@ void encerrarPrograma() {
     salvarCarrinho();
     salvarVendedores();
     printf("Saindo do programa. Obrigado!\n");
-    Sleep(50);
+    Sleep(40);
     exit(0);
 }
