@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <unistd.h> // No Linux/Mac
 //#include <windows.h>
