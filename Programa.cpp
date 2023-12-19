@@ -3,6 +3,7 @@
 #include <string.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <windows.h>
 
 typedef struct {
     int codigo;
@@ -11,8 +12,6 @@ typedef struct {
 } Vendedor;
 
 Vendedor vendedores[50];
-
-static int contador_vendedor = 0;
 
 typedef struct {
     int codigo;
@@ -45,7 +44,7 @@ void carregarVendedores();
 void salvarVendedores();
 void mostrarVendedores();
 
-
+static int contador_vendedor = 0;
 static int contador_produto = 0;
 static int contador_carrinho = 0;
 static Carrinho carrinho[50];
@@ -54,7 +53,6 @@ static Produto produtos[50];
 int main() {
     setlocale(LC_ALL, "Portuguese");
 
-    // Adicionar chamada para carregar produtos
     carregarProdutos();
 
     menu();
@@ -68,7 +66,7 @@ void infoProduto(Produto prod) {
 void menu() {
     printf("=========================================\n");
     printf("================ Bem-vindo(a) ===========\n");
-    printf("================  Geek Shop   ===========\n");
+    printf("================  SENAI SHOP  ===========\n");
     printf("=========================================\n");
 
     printf("Selecione uma opção abaixo: \n");
@@ -134,11 +132,12 @@ void cadastrarProduto() {
     printf("Informe o preço do produto: \n");
     scanf("%f", &produtos[contador_produto].preco);
 
-    printf("O produto %s foi cadastrado com sucesso.\n", strtok(produtos[contador_produto].nome, "\n"));
+    printf("O produto: | %s |, foi cadastrado com sucesso.\n\n", strtok(produtos[contador_produto].nome, "\n"));
 
     produtos[contador_produto].codigo = (contador_produto + 1);
     contador_produto++;
-
+    Sleep(500);
+    system("cls");
     menu();
 }
 
@@ -151,15 +150,17 @@ void listarProdutos() {
             printf("------------------\n");
         }
     } else {
-        printf("Não temos ainda produtos cadastrados.\n");
+        printf("Não temos produtos cadastrados.\n");
+        printf("Por favor, adicione os produtos.\n");
     }
-
+    Sleep(1000);
+	system("cls");
     menu();
 }
 
 void comprarProduto() {
     if (contador_produto > 0) {
-        printf("Informe o código do produto que deseja adicionar ao carrinho.\n");
+        printf("Informe o código do produto que deseja adicionar ao carrinho.\n\n");
 
         printf("========== Produtos Disponíveis ===========\n");
         for (int i = 0; i < contador_produto; i++) {
@@ -180,21 +181,21 @@ void comprarProduto() {
 
                     if (retorno[0] == 1) {
                         carrinho[retorno[1]].quantidade++;
-                        printf("Aumentei a quantidade do produto %s já existente no carrinho.\n",
+                        printf("Aumentei a quantidade do produto | %s | já existente no carrinho.\n",
                                strtok(carrinho[retorno[1]].produto.nome, "\n"));
                     } else {
                         Produto p = pegarProdutoPorCodigo(codigo);
                         carrinho[contador_carrinho].produto = p;
                         carrinho[contador_carrinho].quantidade = 1;
                         contador_carrinho++;
-                        printf("O produto %s foi adicionado ao carrinho.\n", strtok(p.nome, "\n"));
+                        printf("O produto | %s | foi adicionado ao carrinho.\n", strtok(p.nome, "\n"));
                     }
                 } else {
                     Produto p = pegarProdutoPorCodigo(codigo);
                     carrinho[contador_carrinho].produto = p;
                     carrinho[contador_carrinho].quantidade = 1;
                     contador_carrinho++;
-                    printf("O produto %s foi adicionado ao carrinho.\n", strtok(p.nome, "\n"));
+                    printf("O produto | %s | foi adicionado ao carrinho.\n", strtok(p.nome, "\n"));
                 }
             }
         }
@@ -204,7 +205,8 @@ void comprarProduto() {
     } else {
         printf("Ainda não existem produtos para vender.\n");
     }
-
+    Sleep(1000);
+	system("cls");
     menu();
 }
 
@@ -218,9 +220,10 @@ void visualizarCarrinho() {
             printf("-----------------\n");
         }
     } else {
-        printf("Não temos ainda produtos no carrinho.\n");
+        printf("Ainda não temos produtos no carrinho.\n\n");
     }
-
+    Sleep(1000);
+    system("cls");
     menu();
 }
 
@@ -238,8 +241,8 @@ int *temNoCarrinho(int codigo) {
     static int retorno[] = {0, 0};
     for (int i = 0; i < contador_carrinho; i++) {
         if (carrinho[i].produto.codigo == codigo) {
-            retorno[0] = 1; // tem o produto com este código no carrinho
-            retorno[1] = i; // o índice do produto no carrinho
+            retorno[0] = 1; 
+            retorno[1] = i; 
         }
     }
     return retorno;
@@ -258,15 +261,16 @@ void fecharPedido() {
             printf("Quantidade: %d\n", quantidade);
             printf("---------------\n");
         }
-        printf("Sua fatura é R$ %.2f\n", valorTotal);
+        printf("Sua fatura é: R$ %.2f\n\n", valorTotal);
 
         // limpar carrinho
         contador_carrinho = 0;
         printf("Obrigado pela preferência.\n");
     } else {
-        printf("Você não tem nenhum produto no carrinho ainda.\n");
+        printf("Você ainda não tem produtos no carrinho ainda.\n\n");
     }
-
+    Sleep(1000);
+    system("cls");
     menu();
 }
 
@@ -287,7 +291,7 @@ void salvarProdutos() {
 void carregarProdutos() {
     FILE *arquivo = fopen("produtos.txt", "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo de produtos para leitura.\n");
+        printf("Erro ao abrir o arquivo de produtos para leitura.\n\n");
         return;
     }
 
@@ -301,7 +305,7 @@ void carregarProdutos() {
 void salvarCarrinho() {
     FILE *arquivo = fopen("carrinho.txt", "w");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo do carrinho para escrita.\n");
+        printf("Erro ao abrir o arquivo do carrinho para escrita.\n\n");
         return;
     }
 
@@ -315,7 +319,7 @@ void salvarCarrinho() {
 void carregarCarrinho() {
     FILE *arquivo = fopen("carrinho.txt", "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo do carrinho para leitura.\n");
+        printf("Erro ao abrir o arquivo do carrinho para leitura.\n\n");
         return;
     }
 
@@ -339,7 +343,8 @@ void registrarVendedor() {
     printf("O vendedor %s foi registrado com sucesso.\n", strtok(vendedores[contador_vendedor].nome, "\n"));
 
     contador_vendedor++;
-
+    Sleep(1000);
+    system("cls");
     menu();
 }
 
@@ -370,7 +375,8 @@ void cadastrarComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-
+    Sleep(1000);
+    system("cls");
     menu();
 }
 
@@ -394,7 +400,8 @@ void calcularComissao() {
     if (vendedorEncontrado == 0) {
         printf("Não foi encontrado um vendedor com o código %d.\n", codigoVendedor);
     }
-
+    Sleep(1000);
+    system("cls");
     menu();
 }
 
@@ -405,7 +412,7 @@ void carregarVendedores() {
         return;
     }
 
-    contador_vendedor = 0;  // Inicializa o contador de vendedores
+    contador_vendedor = 0; 
 
     while (fscanf(arquivo, "%d %29[^\n] %f\n", &vendedores[contador_vendedor].codigo, vendedores[contador_vendedor].nome, &vendedores[contador_vendedor].comissao) == 3) {
         contador_vendedor++;
@@ -421,7 +428,7 @@ void carregarVendedores() {
 void salvarVendedores() {
     FILE *arquivo = fopen("vendedores.txt", "w");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo de vendedores para escrita.\n");
+        printf("Erro ao abrir o arquivo de vendedores para escrita.\n\n");
         return;
     }
 
@@ -440,12 +447,12 @@ void mostrarVendedores() {
             printf("Nome: %s\n", vendedores[i].nome);
             printf("Comissão: R$ %.2f\n", vendedores[i].comissao);
             printf("--------------------\n");
-            sleep(1);
+            sleep(1000);
         }
-        sleep(2);
+        sleep(1000);
     } else {
-        printf("Não há vendedores registrados.\n");
-        sleep(2);
+        printf("Não há vendedores registrados.\n\n");
+        sleep(1000);
     }
 }
 
@@ -454,5 +461,6 @@ void encerrarPrograma() {
     salvarCarrinho();
     salvarVendedores();
     printf("Saindo do programa. Obrigado!\n");
+    Sleep(1000);
     exit(0);
 }
