@@ -43,6 +43,8 @@ void cadastrarComissao();
 void calcularComissao();
 void carregarVendedores();
 void salvarVendedores();
+void mostrarVendedores();
+
 
 static int contador_produto = 0;
 static int contador_carrinho = 0;
@@ -78,7 +80,7 @@ void menu() {
     printf("6 - Registrar vendedor\n");
     printf("7 - Cadastrar comissão\n");
     printf("8 - Calcular comissão\n");
-    printf("9 - Carregar vendedores\n");
+    printf("9 - Mostrar vendedores\n");
     printf("10 - Sair do sistema\n");
 
     int opcao;
@@ -111,7 +113,7 @@ void menu() {
             calcularComissao();
             break;
         case 9:
-            carregarVendedores();
+            mostrarVendedores();
             break;
         case 10:
             encerrarPrograma();
@@ -403,8 +405,14 @@ void carregarVendedores() {
         return;
     }
 
-    while (fscanf(arquivo, "%d %[^\n] %f\n", &vendedores[contador_vendedor].codigo, vendedores[contador_vendedor].nome, &vendedores[contador_vendedor].comissao) == 3) {
+    contador_vendedor = 0;  // Inicializa o contador de vendedores
+
+    while (fscanf(arquivo, "%d %29[^\n] %f\n", &vendedores[contador_vendedor].codigo, vendedores[contador_vendedor].nome, &vendedores[contador_vendedor].comissao) == 3) {
         contador_vendedor++;
+        if (contador_vendedor >= 50) {
+            printf("Limite de vendedores excedido. Ajuste o código para acomodar mais vendedores.\n");
+            break;
+        }
     }
 
     fclose(arquivo);
@@ -422,6 +430,23 @@ void salvarVendedores() {
     }
 
     fclose(arquivo);
+}
+void mostrarVendedores() {
+    if (contador_vendedor > 0) {
+        printf("Lista de Vendedores\n");
+        printf("--------------------\n");
+        for (int i = 0; i < contador_vendedor; i++) {
+            printf("Código: %d\n", vendedores[i].codigo);
+            printf("Nome: %s\n", vendedores[i].nome);
+            printf("Comissão: R$ %.2f\n", vendedores[i].comissao);
+            printf("--------------------\n");
+            sleep(1);
+        }
+        sleep(2);
+    } else {
+        printf("Não há vendedores registrados.\n");
+        sleep(2);
+    }
 }
 
 void encerrarPrograma() {
