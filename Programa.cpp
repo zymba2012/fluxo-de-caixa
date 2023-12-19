@@ -247,7 +247,7 @@ int *temNoCarrinho(int codigo) {
     return retorno;
 }
 
-void fecharPedido() {
+void fecharPedido() { 
     if (contador_carrinho > 0) {
         float valorTotal = 0.0;
         printf("Produtos do Carrinho\n");
@@ -268,12 +268,12 @@ void fecharPedido() {
     } else {
         printf("Você ainda não tem produtos no carrinho ainda.\n\n");
     }
-	    Sleep(20);
-	    system("cls");
+    Sleep(1000);
+    system("cls");
     menu();
 }
 
-void salvarProdutos() {
+void salvarProdutos() { 
     FILE *arquivo = fopen("produtos.txt", "w");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo de produtos para escrita.\n");
@@ -287,12 +287,20 @@ void salvarProdutos() {
     fclose(arquivo);
 }
 
-void carregarProdutos() {
+void carregarProdutos() { 
     FILE *arquivo = fopen("produtos.txt", "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo de produtos para leitura.\n\n");
         return;
     }
+
+    while (fscanf(arquivo, "%d %[^\n] %f\n", &produtos[contador_produto].codigo, produtos[contador_produto].nome, &produtos[contador_produto].preco) == 3) {
+        contador_produto++;
+    }
+
+    fclose(arquivo);
+}
+
 
     while (fscanf(arquivo, "%d %[^\n] %f\n", &produtos[contador_produto].codigo, produtos[contador_produto].nome, &produtos[contador_produto].preco) == 3) {
         contador_produto++;
